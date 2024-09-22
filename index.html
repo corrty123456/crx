@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特殊碼介面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        input[type="password"], input[type="file"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+        }
+
+        .submit-btn {
+            padding: 10px 20px;
+            background-color: #ffaf7b;
+            color: #fff;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+            background-color: #d76d77;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.95);
+        }
+
+        .small-text {
+            margin-top: 15px;
+            font-size: 0.8em;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="code-container">
+        <h1>請輸入特殊碼</h1>
+        <input type="password" id="code-input" placeholder="輸入特殊碼" />
+        <button class="submit-btn" onclick="checkCode()">確認</button>
+        <div class="small-text" onclick="enterNormalPage()">不是工作人員?</div>
+    </div>
+
+    <div class="container" id="admin-container" style="display: none;">
+        <h1>編輯檔案上傳</h1>
+        <input type="file" id="fileInput" />
+        <button class="submit-btn" onclick="uploadFile()">上傳檔案</button>
+        <p id="uploadStatus"></p>
+    </div>
+
+    <div class="container" id="normal-container" style="display: none;">
+        <h1>下載您的檔案</h1>
+        <a href="#" id="download-link" class="submit-btn">點此下載</a>
+    </div>
+
+    <script>
+        const correctCode = "1237";
+
+        function checkCode() {
+            const enteredCode = document.getElementById("code-input").value;
+            if (enteredCode === correctCode) {
+                document.getElementById("code-container").style.display = "none";
+                document.getElementById("admin-container").style.display = "block";
+            } else {
+                alert("特殊碼錯誤");
+            }
+        }
+
+        function enterNormalPage() {
+            document.getElementById("code-container").style.display = "none";
+            document.getElementById("normal-container").style.display = "block";
+            const storedFile = localStorage.getItem("uploadedFile");
+            const storedFileName = localStorage.getItem("uploadedFileName");
+            if (storedFile && storedFileName) {
+                document.getElementById("download-link").href = storedFile;
+                document.getElementById("download-link").download = storedFileName;
+                document.getElementById("download-link").innerText = "點此下載 " + storedFileName;
+            } else {
+                document.getElementById("download-link").innerText = "目前沒有可下載的檔案";
+            }
+        }
+
+        function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const fileUrl = event.target.result;
+                    localStorage.setItem("uploadedFile", fileUrl);
+                    localStorage.setItem("uploadedFileName", file.name);
+                    document.getElementById("uploadStatus").innerText = "檔案上傳成功!";
+                };
+                reader.readAsDataURL(file); // 將檔案轉換成 Base64
+            } else {
+                document.getElementById("uploadStatus").innerText = "請選擇檔案";
+            }
+        }
+    </script>
+</body>
+</html>
